@@ -3,30 +3,14 @@ var bcrypt   = require('bcrypt-nodejs');
 
 // define the schema for user
 var userSchema = mongoose.Schema({
-
-    local            : {
-        email        : String,
-        password     : String,
-    },
-    facebook         : {
-        id           : String,
-        token        : String,
-        email        : String,
-        name         : String
-    },
-    twitter          : {
-        id           : String,
-        token        : String,
-        displayName  : String,
-        username     : String
-    },
-    google           : {
-        id           : String,
-        token        : String,
-        email        : String,
-        name         : String
-    }
-
+    name            : String,
+    phone           : String,
+    email           : String,
+    password        : String,
+    role            : String,
+    changePassword  : Boolean
+},{
+    timestamps: true
 });
 
 // methods ======================
@@ -37,8 +21,31 @@ userSchema.methods.generateHash = function(password) {
 
 // checking if password is valid
 userSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.local.password);
+    return bcrypt.compareSync(password, this.password);
 };
 
 // create the model for users and expose it to our app
-module.exports = mongoose.model('User', userSchema);
+var User = mongoose.model('User', userSchema);
+
+// Create basic admin user
+User.findOne( {'email' : 'jens@silentmode.com' }, function(err, user){
+    if(!user){
+
+        console.log('Creating basic admin user');
+
+        var admin = new User();
+        admin.name              = 'Jens H. Nielsen';
+        admin.phone             = '+85298005568';
+        admin.email             = 'jens@silentmode.com';
+        admin.password          = Math.random().toString(36).slice(-8);
+        admin.role              = 'Administrator';
+        admin.changePassword    = true;
+        admin.save(function (err, newUser) {
+            if (err) return console.error(err);
+            console.log('Admin password ', admin.password);
+        })
+    }
+});
+
+// Create basic admin user
+module.exports = User;

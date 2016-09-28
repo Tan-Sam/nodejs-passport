@@ -1,28 +1,5 @@
 module.exports = function(app, passport){
 
-  // Routes
-  // router middelware
-  function isLoggedIn(req, res, next) {
-
-    if(req.isAuthenticated()) {
-      return next();
-    }
-
-    res.redirect('/')
-  }
-
-  // Sign up
-  app.get('/', function(req, res){
-    res.render('signup', { message: req.flash('loginMessage') });
-  });
-
-  // Sign up
-  app.post('/', passport.authenticate('local-signup', {
-    successRedirect : '/secret',
-    failureRedirect : '/',
-    failureFlash: true
-  }));
-
   // Login
   app.get('/login', function(req, res){
     res.render('login', { message: req.flash('loginMessage') });
@@ -35,8 +12,24 @@ module.exports = function(app, passport){
     failureFlash: true
   }));
 
-    // Secret
-  app.get('/secret', isLoggedIn, function(req, res){
+  //
+  app.get('/2fa', function(req, res){
+    res.render('2fa', { message: req.flash('loginMessage') });
+  });
+
+  app.post('/2fa', function(req, res){
+    res.render('2fa', { message: req.flash('loginMessage') });
+  });
+
+
+  // Sign up
+  app.get('/', function(req, res){
+    res.render('secret', { message: req.flash('loginMessage') });
+  });
+
+
+  // Secret
+  app.get('/secret', function(req, res){
     res.render('secret', { message: req.flash('loginMessage') });
   });
 
@@ -45,4 +38,5 @@ module.exports = function(app, passport){
     req.logout();
     res.redirect('/');
   });
+
 }

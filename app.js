@@ -11,7 +11,7 @@ var session = require('express-session');
 var app = express();
 
 // Connect with Mongo DB
-mongoose.connect('mongodb://localhost/passport');
+mongoose.connect('mongodb://localhost/sm_backend');
 
 // Init middel-ware
 app.use(cookieParser());
@@ -30,6 +30,16 @@ app.use(flash());
 
 // Setup local-strategy
 require('./config/passport')(passport);
+
+
+// For all routes a user should be logged in except /login
+app.all('*', function(req, res, next){
+    if(req.isAuthenticated() || req.url === '/login') {
+        return next();
+    }
+
+    res.redirect('/login')
+});
 
 // Routes
 require('./routes/routes')(app, passport);
